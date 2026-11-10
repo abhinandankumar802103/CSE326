@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HackNova - Hackathon Project Submission & Jury Leaderboard</title>
+    <!-- Google Font for clean typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ========================================================
+         TOP NAVIGATION BAR
+         ======================================================== -->
+    <header class="navbar" id="mainNavbar">
+        <div class="nav-container">
+            <div class="brand-logo" onclick="app.navigateToHome()">
+                <span class="logo-icon">⚡</span>
+                <span class="brand-name">Hack<strong>Nova</strong></span>
+                <span class="brand-badge">2026 Portal</span>
+            </div>
+
+            <!-- Dynamic Navigation Links (Shown after login) -->
+            <nav class="nav-links" id="navLinks" style="display: none;">
+                <button class="nav-btn" id="navBtnGallery" onclick="app.showSection('gallerySection')">
+                    🎨 Finalist Gallery
+                </button>
+                <button class="nav-btn active" id="navBtnParticipant" onclick="app.showSection('participantSection')">
+                    🧑‍💻 Submit Project
+                </button>
+                <button class="nav-btn" id="navBtnJudge" onclick="app.showSection('judgeSection')">
+                    ⚖️ Jury Evaluation
+                </button>
+                <button class="nav-btn" id="navBtnLeaderboard" onclick="app.showSection('leaderboardSection')">
+                    🏆 Leaderboard
+                </button>
+                <button class="nav-btn" id="navBtnAdmin" onclick="app.showSection('adminSection')">
+                    🛡️ Admin Panel
+                </button>
+            </nav>
+
+            <!-- User Auth Status / Action -->
+            <div class="nav-user-actions" id="userActions">
+                <div class="user-badge" id="userBadge" style="display: none;">
+                    <span class="user-avatar" id="userAvatar">🧑</span>
+                    <div class="user-meta">
+                        <span class="user-name" id="userNameDisplay">Team Alpha</span>
+                        <span class="user-role-tag" id="userRoleDisplay">Participant</span>
+                    </div>
+                    <button class="logout-btn" onclick="app.logout()" title="Logout">
+                        Logout 🚪
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="main-container">
+
+        <!-- ========================================================
+             VIEW 1: LOGIN & ROLE SELECTOR SCREEN
+             ======================================================== -->
+        <section class="view-section active-view" id="loginSection">
+            <div class="login-wrapper">
+                <div class="login-header text-center">
+                    <div class="portal-badge">⚡ Welcome to HackNova 2026</div>
+                    <h1 class="portal-title">Hackathon Submission & Jury Leaderboard Portal</h1>
+                    <p class="portal-subtitle">
+                        Please sign in with your role to access project submission, jury evaluation, or the live hackathon leaderboard.
+                    </p>
+                </div>
+
+                <div class="login-card-container">
+                    <!-- Standard Login Form -->
+                    <div class="login-card">
+                        <h2 class="card-title">🔐 Account Login</h2>
+                        <p class="card-subtitle">Choose your portal role and sign in</p>
+                        
+                        <form id="loginForm" onsubmit="app.handleLoginFormSubmit(event)">
+                            <div class="form-group">
+                                <label for="loginRoleSelect">Select Your Role</label>
+                                <select id="loginRoleSelect" class="form-control" required>
+                                    <option value="participant">🧑‍💻 Participant (Team)</option>
+                                    <option value="judge">⚖️ Jury / Judge</option>
+                                    <option value="admin">🛡️ Hackathon Admin</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="loginUsername">Username / Team Name</label>
+                                <input type="text" id="loginUsername" class="form-control" placeholder="Enter username or team name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="loginPassword">Password</label>
+                                <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                                <small class="form-hint">Tip: For demo, you can enter any password</small>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block">
+                                Sign In to Portal ➔
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- 1-Click Quick Demo Sign-in (Crucial for Viva & Video Presentation) -->
+                    <div class="quick-demo-card">
+                        <div class="quick-demo-header">
+                            <h3>⚡ 1-Click Demo Login</h3>
+                            <p>Instantly explore each dashboard without manually typing credentials:</p>
+                        </div>
+
+                        <div class="quick-demo-buttons">
+                            <button class="quick-btn participant-quick" onclick="app.quickLogin('participant', 'Team Binary', 'Cyber Knights')">
+                                <div class="quick-icon">🧑‍💻</div>
+                                <div class="quick-info">
+                                    <strong>Participant Portal</strong>
+                                    <span>Submit projects & view own status</span>
+                                </div>
+                                <span class="arrow-tag">Enter ➔</span>
+                            </button>
+
+                            <button class="quick-btn judge-quick" onclick="app.quickLogin('judge', 'Prof. Sharma', 'Senior Jury Member')">
+                                <div class="quick-icon">⚖️</div>
+                                <div class="quick-info">
+                                    <strong>Jury / Judge Portal</strong>
+                                    <span>Review code & grade submitted projects</span>
+                                </div>
+                                <span class="arrow-tag">Enter ➔</span>
+                            </button>
+
+                            <button class="quick-btn admin-quick" onclick="app.quickLogin('admin', 'Admin Coordinator', 'Organizing Committee')">
+                                <div class="quick-icon">🛡️</div>
+                                <div class="quick-info">
+                                    <strong>Admin Panel</strong>
+                                    <span>Manage teams, scores, & hackathon stats</span>
+                                </div>
+                                <span class="arrow-tag">Enter ➔</span>
+                            </button>
+                        </div>
+
+                        <!-- Direct Public Access -->
+                        <div class="public-leaderboard-link text-center">
+                            <span>Explore without sign-in: </span>
+                            <a href="javascript:void(0)" onclick="app.quickLogin('guest', 'Guest Viewer', 'Spectator'); app.showSection('gallerySection')">
+                                🎨 Finalist Gallery
+                            </a>
+                            <span> • </span>
+                            <a href="javascript:void(0)" onclick="app.quickLogin('guest', 'Guest Viewer', 'Spectator'); app.showSection('leaderboardSection')">
+                                🏆 Live Leaderboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================================
+             VIEW 2: PARTICIPANT DASHBOARD
+             ======================================================== -->
+        <section class="view-section" id="participantSection">
+            <div class="section-header">
+                <div>
+                    <span class="section-tag">Participant Zone</span>
+                    <h1 class="section-title">Submit & Track Your Project</h1>
+                    <p class="section-subtitle">Register your hackathon project submission and track your live evaluation status.</p>
+                </div>
+                <div class="status-summary-pill" id="participantStatusPill">
+                    Status: <span id="participantSubmissionStatus">No Submission Yet</span>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Submission Form -->
+                <div class="dashboard-card main-form-card">
+                    <div class="card-top">
+                        <h2>📝 Project Submission Form</h2>
+                        <span class="required-note">* All fields are mandatory</span>
+                    </div>
+
+                    <form id="submissionForm" onsubmit="app.handleProjectSubmission(event)">
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label for="teamNameInput">Team Name *</label>
+                                <input type="text" id="teamNameInput" class="form-control" placeholder="e.g. CodeWarriors" required>
+                            </div>
+                            <div class="form-group half">
+                                <label for="projectTitleInput">Project Title *</label>
+                                <input type="text" id="projectTitleInput" class="form-control" placeholder="e.g. HealthBridge - AI Medical Triage" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label for="projectCategorySelect">Hackathon Track / Category *</label>
+                                <select id="projectCategorySelect" class="form-control" required>
+                                    <option value="" disabled selected>Select Track</option>
+                                    <option value="Web & Mobile App">Web & Mobile Application</option>
+                                    <option value="AI & Machine Learning">AI & Machine Learning</option>
+                                    <option value="Healthcare & BioTech">Healthcare & BioTech</option>
+                                    <option value="EdTech & Social Good">EdTech & Social Good</option>
+                                    <option value="FinTech & Blockchain">FinTech & Blockchain</option>
+                                    <option value="Smart City & IoT">Smart City & IoT</option>
+                                </select>
+                            </div>
+                            <div class="form-group half">
+                                <label for="techStackInput">Tech Stack Used *</label>
+                                <input type="text" id="techStackInput" class="form-control" placeholder="e.g. HTML5, CSS3, JavaScript, Python" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="projectDescriptionInput">Problem & Solution Summary *</label>
+                            <textarea id="projectDescriptionInput" class="form-control" rows="3" placeholder="Briefly describe what problem your project solves, key features, and how it works..." required></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label for="repoUrlInput">GitHub Repository Link *</label>
+                                <input type="url" id="repoUrlInput" class="form-control" placeholder="https://github.com/username/project" required>
+                            </div>
+                            <div class="form-group half">
+                                <label for="demoUrlInput">Live Demo / Video Pitch Link *</label>
+                                <input type="url" id="demoUrlInput" class="form-control" placeholder="https://myproject.vercel.app or YouTube" required>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="submitProjectBtn">
+                                🚀 Submit Project for Evaluation
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                Reset Form
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Participant Quick Guidelines & Current Status -->
+                <div class="dashboard-card info-sidebar-card">
+                    <h2>📋 Submission Rules</h2>
+                    <ul class="guidelines-list">
+                        <li>
+                            <span class="bullet-icon">✅</span>
+                            <div>
+                                <strong>Functional Code:</strong>
+                                <p>Repository must include valid source code with a proper README.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="bullet-icon">🎯</span>
+                            <div>
+                                <strong>Evaluation Criteria:</strong>
+                                <p>Innovation (25), Execution (25), UI/UX (25), and Presentation (25).</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="bullet-icon">⏱️</span>
+                            <div>
+                                <strong>Jury Review:</strong>
+                                <p>Once submitted, your project will immediately appear on the Jury Evaluation board.</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="my-submission-box" id="mySubmissionBox">
+                        <h3>Your Active Submission</h3>
+                        <div id="mySubmissionContent" class="empty-state-sm">
+                            No project submitted under this session yet. Fill the form to submit!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================================
+             VIEW 3: JURY / JUDGE EVALUATION PANEL
+             ======================================================== -->
+        <section class="view-section" id="judgeSection">
+            <div class="section-header">
+                <div>
+                    <span class="section-tag">Jury Portal</span>
+                    <h1 class="section-title">Project Evaluation & Grading Desk</h1>
+                    <p class="section-subtitle">Review submitted hackathon projects, verify code repositories, and grade across standard evaluation rubrics.</p>
+                </div>
+                <div class="jury-stats-pill">
+                    <span id="juryPendingCount">0</span> Projects Pending Evaluation
+                </div>
+            </div>
+
+            <!-- Judge Criteria Control Card -->
+            <div class="jury-criteria-card">
+                <div class="criteria-info">
+                    <span class="criteria-badge">⚙️ Judge Finalist Control</span>
+                    <h3>Set Minimum Finalist Qualification Score</h3>
+                    <p>Decide the minimum benchmark score required for submissions to qualify into the public <strong>Finalist Gallery</strong>.</p>
+                </div>
+                <div class="criteria-control-box">
+                    <div class="criteria-score-display">
+                        <span class="cutoff-number" id="judgeCutoffValueDisplay">75</span>
+                        <span class="cutoff-denom">/ 100 pts minimum</span>
+                    </div>
+                    <div class="cutoff-slider-wrapper">
+                        <input type="range" id="judgeCutoffSlider" min="50" max="95" value="75" step="1" class="score-slider" oninput="app.handleCutoffChange(this.value)">
+                        <div class="slider-marks">
+                            <span>50 (Lenient)</span>
+                            <span>75 (Standard)</span>
+                            <span>95 (Strict)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter and Search for Jury -->
+            <div class="filter-bar">
+                <input type="text" id="judgeSearchInput" class="form-control search-input" placeholder="🔍 Search projects by title, team, or track..." oninput="app.renderJudgeProjects()">
+                <div class="filter-controls">
+                    <select id="judgeStatusFilter" class="form-control filter-select" onchange="app.renderJudgeProjects()">
+                        <option value="all">All Projects</option>
+                        <option value="pending" selected>Pending Review</option>
+                        <option value="evaluated">Already Evaluated</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- List of Projects to evaluate -->
+            <div class="judge-projects-grid" id="judgeProjectsGrid">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+
+        <!-- ========================================================
+             VIEW: FINALIST PROJECT GALLERY
+             ======================================================== -->
+        <section class="view-section" id="gallerySection">
+            <div class="section-header">
+                <div>
+                    <span class="section-tag">Finalist Showcase</span>
+                    <h1 class="section-title">🎨 Finalist Project Gallery</h1>
+                    <p class="section-subtitle">Explore shortlisted hackathon entries with source code repositories, demo videos, and tech stacks.</p>
+                </div>
+                <div class="header-pills-row">
+                    <div class="status-summary-pill" id="galleryCutoffPill">
+                        🎯 Jury Cutoff: <strong id="galleryCutoffBadge">75+ Pts</strong>
+                    </div>
+                    <div class="status-summary-pill">
+                        <span id="galleryTotalCount">0</span> Qualified Finalists
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Jury Criteria Alert Banner -->
+            <div class="criteria-notice-banner">
+                <span class="notice-icon">⚖️</span>
+                <div class="notice-text">
+                    <strong>Jury Qualification Policy:</strong> The jury panel has set the qualification threshold to <span id="galleryCriteriaRuleScore">75</span>/100 points. Only evaluated projects achieving this standard or higher are shortlisted for the Finalist Showcase.
+                </div>
+            </div>
+
+            <!-- Filter & Search Bar for Finalist Gallery -->
+            <div class="filter-bar">
+                <input type="text" id="gallerySearchInput" class="form-control search-input" placeholder="🔍 Search finalists by project title, team name, or tech..." oninput="app.renderGallery()">
+                <div class="filter-controls">
+                    <select id="galleryCategoryFilter" class="form-control filter-select" onchange="app.renderGallery()">
+                        <option value="all">All Tracks / Domains</option>
+                        <option value="Web & Mobile App">Web & Mobile App</option>
+                        <option value="AI & Machine Learning">AI & Machine Learning</option>
+                        <option value="Healthcare & BioTech">Healthcare & BioTech</option>
+                        <option value="EdTech & Social Good">EdTech & Social Good</option>
+                        <option value="FinTech & Blockchain">FinTech & Blockchain</option>
+                        <option value="Smart City & IoT">Smart City & IoT</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Finalist Project Cards Grid -->
+            <div class="gallery-grid" id="galleryProjectsGrid">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+
+        <!-- ========================================================
+             VIEW 4: LIVE LEADERBOARD
+             ======================================================== -->
+        <section class="view-section" id="leaderboardSection">
+            <div class="section-header text-center-mobile">
+                <div>
+                    <span class="section-tag">Real-Time Rankings</span>
+                    <h1 class="section-title">🏆 Hackathon Jury Leaderboard</h1>
+                    <p class="section-subtitle">Live rankings sorted dynamically based on Jury Evaluation total scores (out of 100).</p>
+                </div>
+                <div class="last-updated-badge" id="lastUpdatedBadge">
+                    🔄 Auto-Synced with Evaluation Desk
+                </div>
+            </div>
+
+            <!-- Top 3 Podium Highlights -->
+            <div class="podium-container" id="leaderboardPodium">
+                <!-- Dynamically populated top 3 cards -->
+            </div>
+
+            <!-- Search & Filter Controls -->
+            <div class="filter-bar">
+                <input type="text" id="leaderboardSearchInput" class="form-control search-input" placeholder="🔍 Search leaderboard by team or project name..." oninput="app.renderLeaderboard()">
+                <div class="filter-controls">
+                    <select id="leaderboardCategoryFilter" class="form-control filter-select" onchange="app.renderLeaderboard()">
+                        <option value="all">All Tracks / Domains</option>
+                        <option value="Web & Mobile App">Web & Mobile App</option>
+                        <option value="AI & Machine Learning">AI & Machine Learning</option>
+                        <option value="Healthcare & BioTech">Healthcare & BioTech</option>
+                        <option value="EdTech & Social Good">EdTech & Social Good</option>
+                        <option value="FinTech & Blockchain">FinTech & Blockchain</option>
+                        <option value="Smart City & IoT">Smart City & IoT</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Full Leaderboard Table -->
+            <div class="table-responsive-wrapper">
+                <table class="leaderboard-table" id="leaderboardTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Rank</th>
+                            <th>Team & Project Title</th>
+                            <th>Track / Category</th>
+                            <th class="text-center">Innovation (25)</th>
+                            <th class="text-center">Technical (25)</th>
+                            <th class="text-center">UI/UX (25)</th>
+                            <th class="text-center">Pitch (25)</th>
+                            <th class="text-center">Total Score (100)</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardTableBody">
+                        <!-- Dynamically filled by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+
+        <!-- ========================================================
+             VIEW 5: ADMIN MANAGEMENT DASHBOARD
+             ======================================================== -->
+        <section class="view-section" id="adminSection">
+            <div class="section-header">
+                <div>
+                    <span class="section-tag">Organizer Desk</span>
+                    <h1 class="section-title">🛡️ Hackathon Admin Control Center</h1>
+                    <p class="section-subtitle">Monitor key hackathon metrics, inspect submissions, and manage system data.</p>
+                </div>
+                <div class="admin-actions-bar">
+                    <button class="btn btn-outline" onclick="app.resetDemoData()">
+                        🔄 Reload Default Demo Data
+                    </button>
+                    <button class="btn btn-danger-outline" onclick="app.clearAllData()">
+                        🗑️ Clear All Submissions
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hackathon Metrics / Stat Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon icon-blue">📁</div>
+                    <div class="stat-details">
+                        <span class="stat-label">Total Submissions</span>
+                        <h2 class="stat-value" id="statTotalSubmissions">0</h2>
+                        <span class="stat-subtext">Teams registered</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon icon-green">✅</div>
+                    <div class="stat-details">
+                        <span class="stat-label">Evaluated Projects</span>
+                        <h2 class="stat-value" id="statEvaluatedCount">0</h2>
+                        <span class="stat-subtext">Graded by Jury</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon icon-purple">⭐</div>
+                    <div class="stat-details">
+                        <span class="stat-label">Highest Score</span>
+                        <h2 class="stat-value" id="statHighestScore">0/100</h2>
+                        <span class="stat-subtext" id="statTopTeamName">Leader: None</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon icon-amber">📊</div>
+                    <div class="stat-details">
+                        <span class="stat-label">Average Score</span>
+                        <h2 class="stat-value" id="statAverageScore">0.0</h2>
+                        <span class="stat-subtext">Across evaluated projects</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Submissions Management Table -->
+            <div class="dashboard-card admin-table-card">
+                <div class="card-top">
+                    <h2>📋 Manage All Project Submissions</h2>
+                    <span class="card-meta">Live view of data stored in browser LocalStorage</span>
+                </div>
+
+                <div class="table-responsive-wrapper">
+                    <table class="leaderboard-table admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Team Name</th>
+                                <th>Project Title</th>
+                                <th>Track</th>
+                                <th>Links</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminProjectsTableBody">
+                            <!-- Injected by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- ========================================================
+         MODAL: JURY EVALUATION FORM (Grading Popup)
+         ======================================================== -->
+    <div class="modal-overlay" id="evaluationModal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div>
+                    <span class="modal-tag">⚖️ Jury Scorecard</span>
+                    <h2 class="modal-title" id="evalModalProjectTitle">Project Evaluation</h2>
+                    <p class="modal-subtitle" id="evalModalTeamName">Team: Sample</p>
+                </div>
+                <button class="modal-close-btn" onclick="app.closeEvaluationModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Project Quick Links & Summary -->
+                <div class="eval-project-summary">
+                    <div class="summary-field">
+                        <strong>Category:</strong> <span id="evalModalCategory">Web & Mobile</span>
+                    </div>
+                    <div class="summary-field">
+                        <strong>Tech Stack:</strong> <span id="evalModalTech">React, Node</span>
+                    </div>
+                    <div class="summary-links">
+                        <a href="#" id="evalModalRepoLink" target="_blank" class="link-btn">💻 GitHub Repo ↗</a>
+                        <a href="#" id="evalModalDemoLink" target="_blank" class="link-btn">🎥 Demo / Pitch ↗</a>
+                    </div>
+                </div>
+
+                <div class="eval-description-box">
+                    <label>Description:</label>
+                    <p id="evalModalDescription">Project summary details...</p>
+                </div>
+
+                <hr class="modal-divider">
+
+                <!-- Rubric Scoring Inputs -->
+                <form id="evaluationForm" onsubmit="app.handleEvaluationSubmit(event)">
+                    <input type="hidden" id="evalProjectId">
+
+                    <h3 class="rubric-heading">Standardized Jury Scoring Rubric (Out of 25 each = 100 Total)</h3>
+
+                    <div class="scoring-grid">
+                        <div class="scoring-card">
+                            <div class="score-label-row">
+                                <label for="scoreInnovation">1. Innovation</label>
+                                <span class="score-display" id="valInnovation">20</span>/25
+                            </div>
+                            <input type="range" id="scoreInnovation" min="0" max="25" value="20" class="score-slider" oninput="app.updateLiveTotal()">
+                        </div>
+
+                        <div class="scoring-card">
+                            <div class="score-label-row">
+                                <label for="scoreTechnical">2. Technical Complexity</label>
+                                <span class="score-display" id="valTechnical">20</span>/25
+                            </div>
+                            <input type="range" id="scoreTechnical" min="0" max="25" value="20" class="score-slider" oninput="app.updateLiveTotal()">
+                        </div>
+
+                        <div class="scoring-card">
+                            <div class="score-label-row">
+                                <label for="scoreUIUX">3. UI/UX Design</label>
+                                <span class="score-display" id="valUIUX">20</span>/25
+                            </div>
+                            <input type="range" id="scoreUIUX" min="0" max="25" value="20" class="score-slider" oninput="app.updateLiveTotal()">
+                        </div>
+
+                        <div class="scoring-card">
+                            <div class="score-label-row">
+                                <label for="scorePitch">4. Presentation</label>
+                                <span class="score-display" id="valPitch">20</span>/25
+                            </div>
+                            <input type="range" id="scorePitch" min="0" max="25" value="20" class="score-slider" oninput="app.updateLiveTotal()">
+                        </div>
+                    </div>
+
+                    <!-- Total Live Calculation -->
+                    <div class="total-score-banner">
+                        <span>Total Score Awarded:</span>
+                        <div class="total-score-badge">
+                            <span id="evalModalTotalScore">80</span> <span class="total-denom">/ 100</span>
+                        </div>
+                    </div>
+
+                    <!-- Judge Finalist Decision -->
+                    <div class="finalist-decision-card">
+                        <label class="finalist-checkbox-label">
+                            <input type="checkbox" id="evalModalFinalistCheckbox" checked onchange="app.handleFinalistCheckboxToggle(this.checked)">
+                            <div class="checkbox-text-wrap">
+                                <strong>🏅 Shortlist / Approve as Finalist</strong>
+                                <span id="evalModalCutoffHint">Score (80) meets current jury cutoff of 75+ points</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Jury Feedback Comments -->
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label for="evalJuryFeedback">Jury Comments & Feedback for Team</label>
+                        <textarea id="evalJuryFeedback" class="form-control" rows="2" placeholder="e.g. Excellent UI design, good documentation, clean GitHub code organization."></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="app.closeEvaluationModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">✅ Save Score & Update Leaderboard</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+         TOAST NOTIFICATION (Feedback popup)
+         ======================================================== -->
+    <div class="toast-notification" id="toastNotification">
+        <span class="toast-icon" id="toastIcon">ℹ️</span>
+        <span class="toast-message" id="toastMessage">Action completed successfully!</span>
+    </div>
+
+    <!-- Script linking -->
+    <script src="script.js"></script>
+</body>
+</html>
