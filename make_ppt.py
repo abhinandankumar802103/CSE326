@@ -389,11 +389,18 @@ def create_rich_presentation():
     tp4.font.color.rgb = TEXT_MUTED
 
     # ==========================================
-    # SLIDE 4: RESEARCH & DATA (Native PPT Bar Chart)
+    # SLIDE 4: RESEARCH & DATA (High-Contrast PPT Bar Chart)
     # ==========================================
     s4 = prs.slides.add_slide(blank_layout)
     set_bg(s4)
     add_slide_header(s4, "Slide 4: Field Research — Survey Numbers & User Demand", "Empirical Data", "Speaker: Member 1")
+
+    # Background card for the chart to enhance contrast
+    chart_bg = s4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.6), Inches(6.9), Inches(5.3))
+    chart_bg.fill.solid()
+    chart_bg.fill.fore_color.rgb = CARD_DARK
+    chart_bg.line.color.rgb = BORDER_DARK
+    chart_bg.line.width = Pt(1.5)
 
     # Add Native PowerPoint Bar Chart
     chart_data = CategoryChartData()
@@ -402,20 +409,51 @@ def create_rich_presentation():
 
     chart_shape = s4.shapes.add_chart(
         XL_CHART_TYPE.COLUMN_CLUSTERED,
-        Inches(0.8), Inches(1.8), Inches(6.8), Inches(4.9), chart_data
+        Inches(1.0), Inches(1.8), Inches(6.5), Inches(4.8), chart_data
     )
     chart = chart_shape.chart
     chart.has_legend = False
     chart.has_title = True
-    chart.chart_title.text_frame.text = "User Survey Demand (40 Students & 5 Faculty Judges)"
-    chart.chart_title.text_frame.paragraphs[0].font.size = Pt(12)
+    chart.chart_title.text_frame.text = "Survey Demand (% of 40 Students & 5 Judges)"
+    chart.chart_title.text_frame.paragraphs[0].font.size = Pt(13)
+    chart.chart_title.text_frame.paragraphs[0].font.bold = True
     chart.chart_title.text_frame.paragraphs[0].font.color.rgb = TEXT_WHITE
 
-    # Key Findings Side Cards
-    f1 = s4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(8.0), Inches(1.8), Inches(4.5), Inches(2.3))
+    # Format Category Axis (Labels under each bar) -> Crisp Bold White
+    category_axis = chart.category_axis
+    category_axis.format.line.color.rgb = RGBColor(100, 116, 139)
+    category_axis.tick_labels.font.color.rgb = TEXT_WHITE
+    category_axis.tick_labels.font.size = Pt(10)
+    category_axis.tick_labels.font.bold = True
+
+    # Format Value Axis (Numbers on the left: 0, 20, 40, etc.) -> High Contrast Light Slate
+    value_axis = chart.value_axis
+    value_axis.format.line.color.rgb = RGBColor(100, 116, 139)
+    value_axis.tick_labels.font.color.rgb = RGBColor(226, 232, 240)
+    value_axis.tick_labels.font.size = Pt(10)
+    value_axis.tick_labels.font.bold = True
+    value_axis.has_major_gridlines = True
+    value_axis.major_gridlines.format.line.color.rgb = RGBColor(45, 59, 85)
+
+    # Format Plot & Data Labels on Top of Bars (Bright White Numbers)
+    plot = chart.plots[0]
+    plot.has_data_labels = True
+    data_labels = plot.data_labels
+    data_labels.font.color.rgb = RGBColor(255, 255, 255)
+    data_labels.font.size = Pt(13)
+    data_labels.font.bold = True
+
+    # Color the bars vibrant Cyan so they pop out brightly
+    series = plot.series[0]
+    series.format.fill.solid()
+    series.format.fill.fore_color.rgb = ACCENT_CYAN
+
+    # Key Findings Side Cards (Right Column)
+    f1 = s4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(8.0), Inches(1.6), Inches(4.5), Inches(2.5))
     f1.fill.solid()
     f1.fill.fore_color.rgb = CARD_DARK
     f1.line.color.rgb = ACCENT_INDIGO
+    f1.line.width = Pt(1.5)
     f1_tf = f1.text_frame
     f1_tf.word_wrap = True
     p1 = f1_tf.paragraphs[0]
@@ -423,21 +461,29 @@ def create_rich_presentation():
     p1.font.bold = True
     p1.font.size = Pt(13)
     p1.font.color.rgb = ACCENT_INDIGO
-    p1.space_after = Pt(4)
+    p1.space_after = Pt(6)
     p2 = f1_tf.add_paragraph()
-    p2.text = "80% of faculty judges preferred interactive range sliders because it enforces minimum/maximum limits and removes arithmetic errors."
+    p2.text = "80% of faculty judges preferred interactive range sliders (0-25) because it enforces rubric boundaries and calculates live sums without mental arithmetic."
     p2.font.size = Pt(10)
     p2.font.color.rgb = TEXT_LIGHT
 
-    f2 = s4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(8.0), Inches(4.4), Inches(4.5), Inches(2.3))
+    f2 = s4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(8.0), Inches(4.4), Inches(4.5), Inches(2.5))
     f2.fill.solid()
     f2.fill.fore_color.rgb = CARD_DARK
     f2.line.color.rgb = ACCENT_GREEN
+    f2.line.width = Pt(1.5)
     f2_tf = f2.text_frame
     f2_tf.word_wrap = True
     p1 = f2_tf.paragraphs[0]
-    p1.text = "📌 Finding 2: Need for Screening Filter"
+    p1.text = "📌 Finding 2: Demand for Finalist Filter"
     p1.font.bold = True
+    p1.font.size = Pt(13)
+    p1.font.color.rgb = ACCENT_GREEN
+    p1.space_after = Pt(6)
+    p2 = f2_tf.add_paragraph()
+    p2.text = "92% demanded a dedicated Finalist Gallery, but insisted that low-scoring or unvetted submissions must NOT appear as finalists—motivating our Judge Cutoff Slider."
+    p2.font.size = Pt(10)
+    p2.font.color.rgb = TEXT_LIGHT
     p1.font.size = Pt(13)
     p1.font.color.rgb = ACCENT_GREEN
     p1.space_after = Pt(4)
@@ -823,17 +869,25 @@ def create_rich_presentation():
     add_flow_step(s12, Inches(9.8), Inches(1.8), nb_w, nb_h, "C", "COMPETITION",
                   "• Far superior to Google Forms & Excel spreadsheets.\n\n• No paid backend server costs.\n\n• 3x faster evaluation turnaround time.", ACCENT_AMBER)
 
-    # Save presentation
-    output_path = "HackNova_Official_Presentation.pptx"
-    prs.save(output_path)
-    print("SUCCESS: Rich presentation created and saved to " + output_path)
-
-    # Also try saving to the original filename if not locked
-    try:
-        prs.save("HackNova_Presentation.pptx")
-        print("SUCCESS: Also updated HackNova_Presentation.pptx")
-    except Exception as e:
-        print("Note: HackNova_Presentation.pptx is currently open in PowerPoint; saved as HackNova_Official_Presentation.pptx")
+    # Save presentation with fallback filenames if open in PowerPoint
+    filenames = [
+        "HackNova_Presentation_Final.pptx",
+        "HackNova_Official_Presentation.pptx",
+        "HackNova_Presentation.pptx"
+    ]
+    saved_files = []
+    for fname in filenames:
+        try:
+            prs.save(fname)
+            saved_files.append(fname)
+            print(f"SUCCESS: Saved {fname}")
+        except PermissionError:
+            print(f"LOCKED: {fname} is currently open in PowerPoint")
+    
+    if not saved_files:
+        alt = "HackNova_Deck_Latest.pptx"
+        prs.save(alt)
+        print(f"SUCCESS: Saved {alt}")
 
 if __name__ == "__main__":
     create_rich_presentation()
